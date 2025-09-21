@@ -1,0 +1,8 @@
+2025-09-22 03:04:18 - ngt-ai-app - INFO - 创建了4个模拟讨论员AI
+2025-09-22 03:04:18 - ngt-ai-app - INFO - 创建裁判AI提供器
+2025-09-22 03:04:18 - ngt-ai-app - INFO - NGT-AI系统初始化完成 (使用模拟API)
+2025-09-22 03:04:52 - ngt-ai-app - INFO - 创建了4个模拟讨论员AI
+2025-09-22 03:04:52 - ngt-ai-app - INFO - 创建裁判AI提供器
+2025-09-22 03:04:52 - ngt-ai-app - INFO - NGT-AI系统初始化完成 (使用模拟API)
+2025-09-22 03:05:41 - ngt-ai-app - INFO - 🚀 决策流程 开始 - 问题: 创业公司在早期阶段应该优先考虑什么？...
+2025-09-22 03:05:48 - ngt-ai-app - ERROR - ❌ 决策流程 错误: Unknown format code 'f' for object of type 'str'
