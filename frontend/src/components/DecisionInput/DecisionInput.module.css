@@ -1,0 +1,124 @@
+﻿.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 24px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.15);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.button {
+  min-width: 120px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #f7f8fa;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+}
+
+.buttonPrimary {
+  background: linear-gradient(135deg, #15b48c, #0c8f6d);
+  color: #f5faf8;
+  border-color: transparent;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.controlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.switchTrack {
+  width: 46px;
+  height: 22px;
+  border-radius: 999px;
+  background: #e3e6eb;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.switchThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.15);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.switchActive .switchTrack {
+  background: rgba(16, 163, 127, 0.2);
+}
+
+.switchActive .switchThumb {
+  transform: translateX(24px);
+  background: var(--accent);
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.sliderRow input[type='range'] {
+  flex: 1;
+  accent-color: var(--accent);
+}

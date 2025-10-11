@@ -1,0 +1,75 @@
+﻿.dashboard {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-rows: 100%;
+  grid-template-areas: 'sidebar main';
+  gap: 20px;
+  padding: 24px;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (max-width: 1200px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'main'
+      'sidebar';
+    height: auto;
+  }
+}
+
+.sidebarArea {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mainArea {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'progress progress'
+    'controls report';
+  gap: 18px;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.progressArea {
+  grid-area: progress;
+}
+
+.controlsArea {
+  grid-area: controls;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+}
+
+.agentsArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.inputArea {
+  flex: 0 0 auto;
+}
+
+.reportArea {
+  grid-area: report;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

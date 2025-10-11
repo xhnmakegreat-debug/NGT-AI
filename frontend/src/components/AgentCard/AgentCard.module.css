@@ -1,0 +1,119 @@
+﻿.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+}
+
+.cardReferee {
+  border-color: rgba(255, 196, 80, 0.6);
+  box-shadow: 0 0 0 2px rgba(255, 196, 80, 0.18);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #f0f2f4;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.refereeAvatar {
+  background: #fff5dc;
+  color: #b6861d;
+}
+
+.modelSelect {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #f7f8fa;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.modelSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.15);
+}
+
+.promptLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.promptInput {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fafbfc;
+  color: var(--text);
+  resize: vertical;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.promptInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.12);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.score strong {
+  font-size: 18px;
+  color: var(--accent);
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+.sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 38px;
+}
+
+.sparklineBar {
+  width: 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(16, 163, 127, 0.7), rgba(16, 163, 127, 0.2));
+}
+
+.sparklineBarMuted {
+  background: linear-gradient(180deg, rgba(99, 103, 111, 0.6), rgba(99, 103, 111, 0.2));
+}
