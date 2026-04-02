@@ -1,6 +1,7 @@
-﻿import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import styles from './AgentCard.module.css';
+import { useLanguage } from '../../i18n/LanguageContext.jsx';
 
 const MODEL_OPTIONS = [
   { value: 'gpt-4o', label: 'GPT-4' },
@@ -13,6 +14,7 @@ const MODEL_OPTIONS = [
 
 function AgentCard({ agent, onModelChange, onPromptChange }) {
   const isReferee = agent.type === 'referee';
+  const { t } = useLanguage();
 
   return (
     <article className={clsx('glass-panel', styles.card, isReferee && styles.cardReferee)}>
@@ -32,7 +34,7 @@ function AgentCard({ agent, onModelChange, onPromptChange }) {
       </div>
 
       <div>
-        <span className={styles.promptLabel}>角色提示</span>
+        <span className={styles.promptLabel}>{t('agentCard.promptLabel')}</span>
         <textarea
           className={styles.promptInput}
           value={agent.prompt}
@@ -43,12 +45,13 @@ function AgentCard({ agent, onModelChange, onPromptChange }) {
 
       <div className={styles.stats}>
         <div className={styles.score}>
-          <span>平均得分</span>
+          <span>{t('agentCard.averageScore')}</span>
           <strong>{agent.averageScore.toFixed(1)}</strong>
         </div>
         <div className={styles.sparkline}>
           {agent.scoreHistory.map((score, index) => (
             <span
+              // eslint-disable-next-line react/no-array-index-key
               key={index}
               className={clsx(
                 styles.sparklineBar,

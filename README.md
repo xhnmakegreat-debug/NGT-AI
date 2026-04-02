@@ -269,6 +269,9 @@ python test_imports.py
 
 # 验证基础功能
 python -c "from src.core.orchestrator import NGTOrchestrator; print('✅ 导入成功')"
+
+# 运行数据库迁移（首次或结构更新后）
+alembic upgrade head
 ```
 
 ## 📈 性能优化

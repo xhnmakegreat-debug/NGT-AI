@@ -1,0 +1,12 @@
+This directory contains Alembic migration scripts.
+
+- `env.py` wires Alembic to the application's SQLAlchemy metadata.
+- `versions/` stores incremental migration files.
+- `script.py.mako` is the template used when generating new revisions.
+
+Run migrations with:
+
+```
+alembic upgrade head
+alembic downgrade -1
+```

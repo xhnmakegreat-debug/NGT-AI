@@ -1,35 +1,59 @@
-﻿import PropTypes from 'prop-types';
+import { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './ReportViewer.module.css';
+import { useLanguage } from '../../i18n/LanguageContext.jsx';
 
 function ReportViewer({ report, onExport, onCopy, onToggleTheme }) {
-  const hasSections = Array.isArray(report.sections) && report.sections.length > 0;
+  const { t } = useLanguage();
+  const displaySections = useMemo(() => {
+    const sections = Array.isArray(report?.sections) ? report.sections : [];
+    return sections.filter((section) => {
+      if (!section) return false;
+      if (section.hidden === true) return false;
+      if (typeof section.type === 'string' && section.type.toLowerCase() === 'parameters') {
+        return false;
+      }
+      const title = typeof section.title === 'string' ? section.title : '';
+      if (!title) return true;
+      const lowerTitle = title.toLowerCase();
+      if (lowerTitle.includes('参数')) {
+        return false;
+      }
+      if (lowerTitle.includes('parameter')) {
+        return false;
+      }
+      return true;
+    });
+  }, [report]);
+  const hasSections = displaySections.length > 0;
 
   return (
     <section className={`glass-panel ${styles.container}`}>
       <header className={styles.toolbar}>
-        <h2 className={`${styles.toolbarTitle} neon-text`}>协作报告</h2>
+        <h2 className={`${styles.toolbarTitle} neon-text`}>{t('reportViewer.title')}</h2>
         <div className={styles.actions}>
           <button type="button" className={styles.actionButton} onClick={onExport}>
-            导出
+            {t('reportViewer.export')}
           </button>
           <button type="button" className={styles.actionButton} onClick={onCopy}>
-            复制
+            {t('reportViewer.copy')}
           </button>
           <button type="button" className={styles.actionButton} onClick={onToggleTheme}>
-            主题
+            {t('reportViewer.theme')}
           </button>
         </div>
       </header>
 
       <div className={`${styles.content} scrollbar-thin`}>
         {hasSections ? (
-          report.sections.map((section) => (
+          displaySections.map((section) => (
             <div key={section.title} className={styles.section}>
               <h3>{section.title}</h3>
               {section.content && <p>{section.content}</p>}
               {Array.isArray(section.items) && section.items.length > 0 && (
                 <ul className={styles.bulletList}>
                   {section.items.map((item, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
                     <li key={index}>{item}</li>
                   ))}
                 </ul>
@@ -38,10 +62,10 @@ function ReportViewer({ report, onExport, onCopy, onToggleTheme }) {
           ))
         ) : (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIllustration}>等待新的输出</div>
+            <div className={styles.emptyIllustration}>{t('reportViewer.waiting')}</div>
             <div>
-              <strong>尚未生成任何报告</strong>
-              <p>运行一次决策任务后，这里会展示完整的协作结果。</p>
+              <strong>{t('reportViewer.emptyTitle')}</strong>
+              <p>{t('reportViewer.emptyHint')}</p>
             </div>
           </div>
         )}

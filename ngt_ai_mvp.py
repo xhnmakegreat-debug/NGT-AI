@@ -15,6 +15,7 @@ import yaml
 from pathlib import Path
 import logging
 from datetime import datetime
+from typing import Dict, Any, List
 
 # 添加项目根目录到Python路径
 project_root = Path(__file__).parent.absolute()
@@ -271,6 +272,81 @@ class NGTDecisionApp:
         self.logger.info("创建模拟裁判AI提供器")
         return referee
     
+    def _create_dynamic_provider(self, agent_config: Dict[str, Any]):
+        """
+        根据前端配置动态创建AI提供器
+        
+        Args:
+            agent_config: 智能体配置字典
+            
+        Returns:
+            创建的提供器实例或None
+        """
+        try:
+            agent_id = agent_config.get('id', 'UNKNOWN')
+            model_name = agent_config.get('model', 'gpt-4o')
+            prompt = agent_config.get('prompt', '')
+            
+            # 根据模型名称确定提供器类型
+            provider_name = self._get_provider_name_by_model(model_name)
+            
+            if provider_name in AVAILABLE_PROVIDERS:
+                # 尝试创建真实API提供器
+                api_key = self._get_api_key_for_model(model_name)
+                if api_key:
+                    provider = self._create_provider(provider_name, api_key, model_name, agent_id, {})
+                    if provider:
+                        # 设置自定义提示词
+                        provider.custom_prompt = prompt
+                        self.logger.info(f"创建动态{provider_name}提供器: {agent_id}")
+                        return provider
+            
+            # 如果无法创建真实提供器，使用模拟提供器
+            mock_provider = MockModelProvider(model_name, agent_id)
+            mock_provider.custom_prompt = prompt
+            self.logger.info(f"创建动态模拟提供器: {agent_id} ({model_name})")
+            return mock_provider
+            
+        except Exception as e:
+            self.logger.error(f"创建动态提供器失败: {e}")
+            return None
+    
+    def _get_provider_name_by_model(self, model_name: str) -> str:
+        """根据模型名称确定提供器类型"""
+        model_to_provider = {
+            'gpt-4o': 'openai',
+            'gpt-4': 'openai',
+            'gpt-3.5-turbo': 'openai',
+            'claude-3-opus': 'anthropic',
+            'claude-3-sonnet': 'anthropic',
+            'claude-3-haiku': 'anthropic',
+            'gemini-1.5-pro': 'google',
+            'gemini-1.5-flash': 'google',
+            'qwen-long': 'qwen',
+            'qwen-plus': 'qwen',
+            'deepseek-chat': 'deepseek',
+            'grok-beta': 'grok',
+        }
+        return model_to_provider.get(model_name, 'openai')
+    
+    def _get_api_key_for_model(self, model_name: str) -> str:
+        """根据模型名称获取API密钥"""
+        provider_name = self._get_provider_name_by_model(model_name)
+        provider_upper = provider_name.upper()
+        
+        # 尝试从环境变量获取
+        env_keys = [
+            f"{provider_upper}_API_KEY",
+            f"{model_name.upper().replace('-', '_')}_API_KEY"
+        ]
+        
+        for env_key in env_keys:
+            api_key = os.getenv(env_key)
+            if api_key:
+                return api_key
+        
+        return None
+    
     async def process_decision(self, question: str, max_retries: int = 2) -> str:
         """
         处理决策问题并返回格式化结果
@@ -297,6 +373,61 @@ class NGTDecisionApp:
         except Exception as e:
             self.ngt_logger.log_error("决策流程", e)
             return f"❌ 决策处理失败: {str(e)}\n\n💡 建议检查API配置或网络连接"
+    
+    async def process_decision_json_with_agents_and_progress(self, question: str, agents_config: List[Dict[str, Any]], progress_callback=None, max_retries: int = 2) -> Dict[str, Any]:
+        """
+        使用动态配置的AI处理决策问题并返回JSON结果，支持进度回调
+        
+        Args:
+            question: 决策问题
+            agents_config: AI智能体配置列表
+            progress_callback: 进度回调函数
+            max_retries: 最大重试次数
+            
+        Returns:
+            决策结果的JSON数据
+        """
+        try:
+            self.ngt_logger.log_stage_start("动态AI决策流程", f"问题: {question[:50]}...")
+            
+            # 根据配置创建动态AI提供器
+            discussant_providers = []
+            referee_provider = None
+            
+            for agent_config in agents_config:
+                provider = self._create_dynamic_provider(agent_config)
+                if provider:
+                    if agent_config.get('type') == 'referee':
+                        referee_provider = provider
+                    else:
+                        discussant_providers.append(provider)
+            
+            # 确保至少有2个讨论员和1个裁判
+            if len(discussant_providers) < 2:
+                self.logger.warning("讨论员数量不足，使用默认配置")
+                discussant_providers = self.discussant_providers[:2]
+            
+            if not referee_provider:
+                self.logger.warning("未配置裁判，使用默认裁判")
+                referee_provider = self.referee_provider
+            
+            # 创建临时编排器
+            from src.core.orchestrator import NGTOrchestrator
+            temp_orchestrator = NGTOrchestrator(discussant_providers, referee_provider)
+            
+            # 执行NGT决策流程，支持进度回调
+            result = await temp_orchestrator.run_decision_process_with_progress(question, max_retries, progress_callback)
+            
+            self.ngt_logger.log_stage_complete("动态AI决策流程", result.get('process_duration'))
+            return result
+            
+        except Exception as e:
+            self.ngt_logger.log_error("动态AI决策流程", e)
+            raise
+    
+    async def process_decision_json_with_agents(self, question: str, agents_config: List[Dict[str, Any]], max_retries: int = 2) -> Dict[str, Any]:
+        """兼容性方法，调用带进度回调的版本"""
+        return await self.process_decision_json_with_agents_and_progress(question, agents_config, None, max_retries)
     
     async def process_decision_json(self, question: str, max_retries: int = 2) -> dict:
         """

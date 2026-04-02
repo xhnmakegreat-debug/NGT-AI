@@ -1,20 +1,23 @@
-﻿import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import AgentCard from '../AgentCard/AgentCard.jsx';
 import styles from './AgentGrid.module.css';
+import { useLanguage } from '../../i18n/LanguageContext.jsx';
 
 function AgentGrid({ agents, onModelChange, onPromptChange }) {
+  const { t } = useLanguage();
+
   return (
     <section className={`glass-panel ${styles.wrapper}`}>
       <div className={styles.titleRow}>
-        <h2 className={`${styles.title} neon-text`}>多智能体配置</h2>
+        <h2 className={`${styles.title} neon-text`}>{t('agentGrid.title')}</h2>
         <div className={styles.legend}>
           <span className={styles.legendItem}>
             <span className={styles.legendSwatch} />
-            讨论员
+            {t('agentGrid.discussant')}
           </span>
           <span className={styles.legendItem}>
             <span className={`${styles.legendSwatch} ${styles.legendSwatchReferee}`} />
-            裁判
+            {t('agentGrid.referee')}
           </span>
         </div>
       </div>

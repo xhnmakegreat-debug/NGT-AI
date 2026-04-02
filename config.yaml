@@ -1,514 +1,305 @@
 # ============================================================
-# NGT-AI 决策系统配置文件
-# Windows 11 优化版本 v2.0
+# NGT-AI 决策系统配置文件 - 详细注释版
+# 用于配置多AI协作决策系统的各项参数
 # ============================================================
 
 # ============ 系统基础配置 ============
 system:
-  name: "NGT-AI Decision System"
-  version: "2.0"
-  description: "基于名义小组技术的多AI协作决策系统"
-  platform: "Windows 11"
-  author: "NGT-AI Team"
-  created: "2024-01-01"
-  updated: "2024-12-20"
-  
+  name: "NGT-AI Decision System"        # 系统名称，用于日志和报告标识
+  version: "2.1"                        # 系统版本号
+  description: "基于名义小组技术的多AI协作决策系统"  # 系统描述
+  platform: "Windows 11"                # 运行平台标识
+  author: "NGT-AI team"                 # 开发团队标识
+
 # ============ 讨论员AI配置 ============
+# 讨论员AI负责在决策流程中独立生成观点、评分、修正或捍卫观点
+# 系统需要至少2个讨论员，推荐4个以获得更好的观点多样性
 discussants:
-  # AI 1 - OpenAI GPT-4
-  - ai_id: "AI_1"
-    model_name: "gpt-4o"
-    provider: "openai"
-    api_key: "${OPENAI_API_KEY}"  # 从环境变量读取
-    base_url: null  # 使用默认URL
-    enabled: true
-    role_description: "技术与可行性分析专家"
-    personality: "严谨、理性、注重实践"
+  # -------- AI 1: OpenAI GPT-4 --------
+  - ai_id: "AI_1"                       # AI的唯一标识符，用于追踪该AI在流程中的所有输出
+    model_name: "gpt-4o"                # 实际使用的模型名称，发送给API的model参数
+    provider: "openai"                  # API提供商标识，对应src/providers/中的provider类
+    api_key: "${OPENAI_API_KEY}"        # API密钥，${VAR}格式表示从环境变量读取，或直接填写密钥字符串
+    base_url: null                      # 自定义API端点，null表示使用默认端点（OpenAI为https://api.openai.com/v1）
+    enabled: true                       # 是否启用此AI，false时系统会跳过此配置
+    role_description: "技术与可行性分析专家"  # AI的角色描述，用于提示词工程和报告生成
+    personality: "严谨、理性、注重实践"      # AI的性格特征，影响其分析风格
     
-  # AI 2 - Google Gemini  
-  - ai_id: "AI_2"
-    model_name: "gemini-1.5-pro"
-    provider: "google"
-    api_key: "${GOOGLE_API_KEY}"
-    base_url: null
-    enabled: true
-    role_description: "用户体验与市场需求专家"
-    personality: "创新、敏锐、用户导向"
+  # -------- AI 2: Google Gemini --------
+  - ai_id: "AI_2"                       # 第二个讨论员的唯一标识
+    model_name: "gemini-1.5-pro"        # Gemini模型名称，支持gemini-1.5-pro或gemini-1.0-pro
+    provider: "google"                  # 使用google_provider.py，需要google-generativeai包
+    api_key: "${GOOGLE_API_KEY}"        # Google AI Studio获取的API密钥
+    base_url: null                      # Gemini不需要自定义base_url
+    enabled: true                       # 启用状态
+    role_description: "用户体验与市场需求专家"  # 此AI关注用户角度
+    personality: "创新、敏锐、用户导向"        # 偏向创新和用户体验
     
-  # AI 3 - DeepSeek
-  - ai_id: "AI_3"
-    model_name: "deepseek-v2"
-    provider: "deepseek"
-    api_key: "${DEEPSEEK_API_KEY}"
-    base_url: "https://api.deepseek.com"
-    enabled: true
-    role_description: "风险管理与合规专家"
-    personality: "谨慎、全面、风险意识强"
+  # -------- AI 3: DeepSeek --------
+  - ai_id: "AI_3"                       # 第三个讨论员标识
+    model_name: "deepseek-chat"         # DeepSeek的聊天模型，也可用deepseek-coder等
+    provider: "deepseek"                # 使用deepseek_provider.py，基于OpenAI兼容接口
+    api_key: "${DEEPSEEK_API_KEY}"      # DeepSeek平台的API密钥
+    base_url: "https://api.deepseek.com"  # DeepSeek的API端点，必须指定
+    enabled: true                       # 启用状态
+    role_description: "风险管理与合规专家"    # 此AI关注风险和合规性
+    personality: "谨慎、全面、风险意识强"      # 偏向保守和全面考虑
     
-  # AI 4 - 阿里云通义千问
-  - ai_id: "AI_4"
-    model_name: "qwen-long"
-    provider: "alibaba"
-    api_key: "${ALIBABA_API_KEY}"
-    base_url: null
-    enabled: true
-    role_description: "创新思维与战略规划专家"
-    personality: "前瞻、大胆、突破性思维"
+  # -------- AI 4: 阿里云通义千问 --------
+  - ai_id: "AI_4"                       # 第四个讨论员标识
+    model_name: "qwen-long"             # 通义千问长文本模型，也可用qwen-turbo、qwen-plus等
+    provider: "qwen"                    # 使用qwen_provider.py，基于HTTP API
+    api_key: "${ALIBABA_API_KEY}"       # 阿里云DashScope的API-KEY
+    base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"  # 通义千问API端点
+    enabled: true                       # 启用状态
+    role_description: "创新思维与战略规划专家"  # 此AI关注创新和战略
+    personality: "前瞻、大胆、突破性思维"      # 偏向创新突破
+  
+  # -------- 可选AI: xAI Grok（默认禁用）--------
+  # - ai_id: "AI_5"                     # 可添加第五个讨论员（系统支持但默认使用4个）
+  #   model_name: "grok-beta"           # Grok模型名称
+  #   provider: "grok"                  # 使用grok_provider.py，基于OpenAI兼容接口
+  #   api_key: "${GROK_API_KEY}"        # xAI平台的API密钥
+  #   base_url: "https://api.x.ai/v1"   # Grok的API端点
+  #   enabled: false                    # 默认禁用，需要时改为true
+  #   role_description: "跨领域综合分析专家"
+  #   personality: "幽默、直率、综合能力强"
 
 # ============ 裁判AI配置 ============
+# 裁判AI负责在流程最后阶段汇总所有观点，进行综合分析和风险评估
+# 通常使用能力更强的模型担任裁判角色
 referee:
-  ai_id: "REFEREE"
-  model_name: "claude-3-opus"
-  provider: "anthropic"
-  api_key: "${ANTHROPIC_API_KEY}"
-  base_url: null
-  enabled: true
-  role_description: "综合分析与决策汇总专家"
-  personality: "客观、公正、综合能力强"
+  ai_id: "REFEREE"                      # 裁判AI的标识符
+  model_name: "claude-3-opus"           # Anthropic Claude模型，也可用gpt-4等
+  provider: "anthropic"                 # API提供商，需要anthropic包和对应的provider
+  api_key: "${ANTHROPIC_API_KEY}"       # Anthropic的API密钥
+  base_url: null                        # Claude不需要自定义base_url
+  enabled: true                         # 启用状态
+  role_description: "综合分析与决策汇总专家"  # 裁判角色描述
+  personality: "客观、公正、综合能力强"      # 裁判需要客观公正
 
 # ============ 模型参数配置 ============
+# 这些参数控制AI生成文本的特性
 model_parameters:
-  # 生成参数
-  temperature: 0.7
-  max_tokens: 2000
-  top_p: 0.9
-  frequency_penalty: 0.0
-  presence_penalty: 0.0
+  # ------ 生成控制参数 ------
+  temperature: 0.7                      # 温度参数(0.0-2.0)，越高越随机创新，越低越确定保守
+                                        # 0.7是平衡值，适合决策分析
+  max_tokens: 2000                      # 单次生成的最大token数，控制回复长度
+                                        # 2000约等于1500-1800字中文
+  top_p: 0.9                           # 核采样参数(0.0-1.0)，控制输出多样性
+                                        # 0.9表示从累计概率90%的token中采样
+  frequency_penalty: 0.0               # 频率惩罚(0.0-2.0)，减少重复内容
+                                        # 0.0表示不惩罚，适合决策分析
+  presence_penalty: 0.0                # 存在惩罚(0.0-2.0)，鼓励讨论新话题
+                                        # 0.0表示不惩罚
   
-  # 超时和重试配置
-  timeout: 30  # 单次请求超时时间(秒)
-  max_retries: 3  # 最大重试次数
-  retry_delay: 1  # 重试延迟(秒)
-  exponential_backoff: true  # 是否使用指数退避
+  # ------ 超时和重试配置 ------
+  timeout: 30                          # 单次API调用超时时间（秒）
+                                        # 30秒适合大部分场景，复杂问题可增加
+  max_retries: 3                       # API调用失败后的最大重试次数
+                                        # 3次重试可应对网络抖动
+  retry_delay: 1                       # 重试前的等待时间（秒）
+                                        # 1秒基础延迟，实际使用指数退避
+  exponential_backoff: true            # 是否使用指数退避策略
+                                        # true时重试间隔为1s, 2s, 4s...
   
-  # 并发控制
-  max_concurrent: 4  # 最大并发请求数
-  rate_limit_rpm: 60  # 每分钟请求限制
-  rate_limit_tpm: 90000  # 每分钟token限制
+  # ------ 并发控制 ------
+  max_concurrent: 4                    # 最大并发API请求数
+                                        # 4表示同时调用4个AI，匹配讨论员数量
+  rate_limit_rpm: 60                   # 每分钟最大请求数限制
+                                        # 60表示每秒最多1个请求
+  rate_limit_tpm: 90000                # 每分钟最大token数限制
+                                        # 90000约等于每分钟处理的字数上限
 
 # ============ NGT流程配置 ============
+# 控制名义小组技术(NGT)六个阶段的具体行为
 ngt_process:
-  # 阶段配置
   stages:
-    # 阶段1: 独立观点生成
+    # ------ 阶段1: 独立观点生成 ------
     stage1_independent_ideas:
-      enabled: true
-      timeout: 60
-      min_participants: 2
-      max_conclusion_length: 1000
-      min_conclusion_length: 100
+      enabled: true                    # 是否启用此阶段，必须为true
+      timeout: 60                      # 阶段超时时间（秒），超时会终止流程
+      min_participants: 2              # 最少需要几个AI成功生成观点才能继续
+                                        # 2表示至少需要2个有效观点
+      max_conclusion_length: 1000      # 单个观点的最大字符数
+                                        # 防止回复过长影响处理效率
+      min_conclusion_length: 100       # 单个观点的最小字符数
+                                        # 确保观点有足够的分析深度
       
-    # 阶段3: 交叉评分
+    # ------ 阶段3: 交叉评分 ------
     stage3_cross_scoring:
-      enabled: true
-      timeout: 90
-      scoring_scale: [1, 5]  # 评分范围
-      require_reason: true  # 要求评分理由
-      min_reason_length: 20
+      enabled: true                    # 是否启用评分阶段
+      timeout: 90                      # 评分阶段超时（秒），通常需要更长时间
+      scoring_scale: [1, 5]            # 评分范围，[最低分, 最高分]
+                                        # [1,5]是标准Likert量表
+      require_reason: true             # 是否要求提供评分理由
+                                        # true确保评分有依据
+      min_reason_length: 20            # 评分理由的最小字符数
+                                        # 确保理由有实质内容
       
-    # 阶段4: 分数聚合
+    # ------ 阶段4: 分数聚合 ------
     stage4_aggregation:
-      enabled: true
-      calculate_variance: true
-      calculate_statistics: true
+      enabled: true                    # 是否启用聚合阶段
+      calculate_variance: true         # 是否计算分数方差
+                                        # true时计算观点的争议程度
+      calculate_statistics: true       # 是否计算详细统计数据
+                                        # 包括平均分、最高分、最低分等
       
-    # 阶段5: 修正或捍卫
+    # ------ 阶段5: 修正或捍卫 ------
     stage5_revision:
-      enabled: true
-      timeout: 60
-      allow_skip: false
-      min_revision_length: 50
-      min_defense_length: 50
+      enabled: true                    # 是否启用修正捍卫阶段
+      timeout: 60                      # 阶段超时时间（秒）
+      allow_skip: false                # 是否允许AI跳过此阶段
+                                        # false确保每个AI都表态
+      min_revision_length: 50          # 修正观点的最小字符数
+      min_defense_length: 50           # 捍卫声明的最小字符数
       
-    # 阶段6: 裁判分析
+    # ------ 阶段6: 裁判分析 ------
     stage6_referee:
-      enabled: true
-      timeout: 120
-      require_risk_analysis: true
-      require_merged_ideas: true
-      require_final_recommendation: true
+      enabled: true                    # 是否启用裁判分析阶段
+      timeout: 120                     # 裁判分析超时（秒），需要最长时间
+      require_risk_analysis: true      # 是否要求风险分析
+                                        # true时裁判必须分析每个方案的风险
+      require_merged_ideas: true       # 是否要求合并相似观点
+                                        # true时裁判需要整合观点
+      require_final_recommendation: true  # 是否要求最终建议
+                                        # true时裁判必须给出明确建议
 
-  # 质量控制
+  # ------ 质量控制 ------
   quality_control:
     # 输入验证
-    min_question_length: 10
-    max_question_length: 2000
-    forbidden_keywords: []
+    min_question_length: 10            # 用户问题的最小字符数
+                                        # 确保问题有实质内容
+    max_question_length: 2000          # 用户问题的最大字符数
+                                        # 防止问题过长影响处理
+    forbidden_keywords: []             # 禁用关键词列表，留空表示不过滤
     
     # 输出验证
-    require_json_format: true
-    validate_json_schema: true
-    validate_scores: true
+    require_json_format: true          # 是否要求AI输出JSON格式
+                                        # true确保输出可被程序解析
+    validate_json_schema: true         # 是否验证JSON结构
+                                        # true时检查JSON是否符合预定义结构
+    validate_scores: true              # 是否验证评分在合法范围内
+                                        # true时检查分数是否在[1,5]内
     
     # 内容质量
-    min_content_quality_score: 3.0
-    check_duplicate_content: true
-    filter_inappropriate_content: false
+    min_content_quality_score: 3.0     # 内容质量最低分数要求
+                                        # 低于此分数的观点会被标记
+    check_duplicate_content: true      # 是否检查重复内容
+                                        # true时检测AI是否重复表述
+    filter_inappropriate_content: false  # 是否过滤不当内容
+                                        # false表示信任AI的内容安全性
 
 # ============ 日志配置 ============
+# 控制系统运行日志的记录方式
 logging:
-  # 基本配置
-  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
-  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  date_format: "%Y-%m-%d %H:%M:%S"
+  level: "INFO"                        # 日志级别：DEBUG, INFO, WARNING, ERROR, CRITICAL
+                                        # INFO适合生产环境，DEBUG用于调试
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # 日志格式
+                                        # 包含时间、模块名、级别、消息
+  date_format: "%Y-%m-%d %H:%M:%S"     # 时间格式
   
-  # 文件日志
+  # 文件日志配置
   file:
-    enabled: true
-    path: "logs/ngt_ai.log"
-    max_size: "10MB"
-    backup_count: 5
-    encoding: "utf-8"
-    rotation: "daily"  # daily, weekly, monthly
-    
-  # 控制台日志
+    enabled: true                      # 是否启用文件日志
+    path: "logs/ngt_ai.log"           # 日志文件路径
+    max_size: "10MB"                   # 单个日志文件最大大小
+    backup_count: 5                    # 保留的日志备份数量
+    encoding: "utf-8"                  # 日志文件编码
+    rotation: "daily"                  # 日志轮转策略：daily, weekly, monthly
+  
+  # 控制台日志配置
   console:
-    enabled: true
-    level: "INFO"
-    colors: true
-    show_timestamp: true
+    enabled: true                      # 是否在控制台输出日志
+    level: "INFO"                      # 控制台日志级别
+    colors: true                       # 是否使用彩色输出
+    show_timestamp: true               # 是否显示时间戳
     
-  # 特定模块日志级别
+  # 模块级别日志配置
   loggers:
-    "ngt-ai-app": "INFO"
-    "orchestrator": "INFO"
-    "providers": "DEBUG"
-    "parser": "WARNING"
-    "state_tracker": "INFO"
-    "presenter": "INFO"
+    "ngt-ai-app": "INFO"              # 主程序日志级别
+    "orchestrator": "INFO"            # 编排器日志级别
+    "providers": "DEBUG"              # API提供器日志级别（DEBUG便于调试API问题）
+    "parser": "WARNING"               # 解析器日志级别
+    "state_tracker": "INFO"           # 状态追踪器日志级别
+    "presenter": "INFO"               # 结果呈现器日志级别
 
 # ============ 输出配置 ============
+# 控制决策结果的输出格式和保存方式
 output:
-  # 默认格式
-  default_format: "markdown"  # markdown, json, text, html
+  default_format: "markdown"           # 默认输出格式：markdown, json, text, html
+                                        # markdown最适合阅读
   
-  # 报告配置
+  # 报告内容配置
   report:
-    include_timestamps: true
-    include_system_info: true
-    include_process_stats: true
-    include_error_summary: true
-    include_intermediate_scores: true
-    include_ai_personalities: false
-    show_token_usage: false
+    include_timestamps: true           # 是否包含时间戳
+    include_system_info: true          # 是否包含系统信息
+    include_process_stats: true        # 是否包含流程统计
+    include_error_summary: true        # 是否包含错误摘要
+    include_intermediate_scores: true  # 是否显示中间评分过程
+    include_ai_personalities: false    # 是否显示AI性格描述
+    show_token_usage: false           # 是否显示token使用量（需API支持）
     
-  # 文件输出
+  # 文件保存配置
   save_to_file:
-    enabled: false
-    directory: "output"
-    filename_pattern: "ngt_decision_{timestamp}.{format}"
-    auto_save: false
-    compression: false  # 是否压缩输出文件
-    
-  # 格式化选项
-  formatting:
-    max_line_length: 80
-    use_colors: true
-    emoji_support: true
-    markdown_tables: true
+    enabled: false                     # 是否自动保存到文件（false需手动保存）
+    directory: "output"                # 保存目录
+    filename_pattern: "ngt_decision_{timestamp}.{format}"  # 文件名模板
+    auto_save: false                   # 是否每次自动保存
+    compression: false                 # 是否压缩保存（用于大量历史记录）
 
-# ============ 安全配置 ============
-security:
-  # API密钥管理
-  mask_api_keys_in_logs: true
-  validate_api_keys: false  # 启动时验证密钥
-  store_encrypted_keys: false
-  
-  # 输入验证
-  max_question_length: 2000
-  forbidden_patterns: []
-  sanitize_input: true
-  
-  # 输出过滤
-  filter_sensitive_content: false
-  content_safety_check: false
-  
-  # 访问控制
-  require_authentication: false
-  allowed_ip_ranges: []
-
-# ============ 性能配置 ============
-performance:
-  # 缓存配置
-  cache:
-    enabled: false
-    type: "memory"  # memory, redis, file
-    ttl: 3600  # 缓存生存时间(秒)
-    max_size: 100  # 最大缓存条目
-    cache_api_responses: false
-    
-  # 监控配置
-  monitoring:
-    track_token_usage: true
-    track_response_time: true
-    track_error_rate: true
-    track_memory_usage: false
-    
-  # 资源限制
-  limits:
-    max_memory_mb: 1024
-    max_execution_time: 300  # 最大执行时间(秒)
-    max_concurrent_sessions: 10
-    
-  # 优化选项
-  optimization:
-    use_asyncio: true
-    connection_pooling: true
-    request_batching: false
-
-# ============ 开发配置 ============
-development:
-  # 调试模式
-  debug_mode: false
-  verbose_logging: false
-  log_api_requests: false
-  log_api_responses: false
-  
-  # 测试配置
-  test_mode: false
-  mock_api_calls: false
-  simulate_errors: false
-  simulate_delays: false
-  
-  # 开发工具
-  enable_profiling: false
-  save_raw_responses: false
-  enable_hot_reload: false
-  
-  # 实验功能
-  experimental_features:
-    enabled: false
-    features: []
-
-# ============ 部署配置 ============
-deployment:
-  environment: "development"  # development, staging, production
-  
-  # 服务配置
-  service:
-    host: "localhost"
-    port: 8000
-    workers: 1
-    
-  # Web界面配置(未来版本)
-  web:
-    enabled: false
-    host: "localhost"
-    port: 8000
-    cors_enabled: true
-    static_files: "static"
-    templates: "templates"
-    
-  # 数据库配置(可选)
-  database:
-    enabled: false
-    type: "sqlite"  # sqlite, postgresql, mysql
-    connection_string: "sqlite:///ngt_ai.db"
-    pool_size: 5
-    
-  # 消息队列(可选)
-  message_queue:
-    enabled: false
-    type: "redis"  # redis, rabbitmq
-    connection_string: "redis://localhost:6379"
-
-# ============ 扩展配置 ============
-extensions:
-  # 插件支持
-  plugins:
-    enabled: false
-    directory: "plugins"
-    auto_load: false
-    
-  # 自定义提供器
-  custom_providers:
-    enabled: false
-    directory: "custom_providers"
-    
-  # 外部集成
-  integrations:
-    # Slack集成
-    slack: 
-      enabled: false
-      webhook_url: null
-      channel: "#ngt-ai"
-      
-    # Microsoft Teams集成
-    teams:
-      enabled: false
-      webhook_url: null
-      
-    # 邮件通知
-    email:
-      enabled: false
-      smtp_server: null
-      smtp_port: 587
-      username: null
-      password: null
-      
-    # 数据导出
-    export:
-      enabled: false
-      formats: ["json", "csv", "xlsx"]
-      schedule: null
-
-# ============ 本地化配置 ============
-localization:
-  language: "zh-CN"
-  timezone: "Asia/Shanghai"
-  currency: "CNY"
-  date_format: "%Y年%m月%d日"
-  time_format: "%H:%M:%S"
-  number_format: "1,000.00"
-  
-  # 多语言支持(未来版本)
-  supported_languages: ["zh-CN", "en-US"]
-  auto_detect_language: false
-
-# ============ Windows特定配置 ============
-windows:
-  # 控制台配置
-  console:
-    encoding: "utf-8"
-    colors: true
-    clear_command: "cls"
-    title: "NGT-AI Decision System"
-    
-  # 路径配置
-  paths:
-    separator: "\\"
-    use_long_paths: true
-    normalize_paths: true
-    
-  # 服务配置
-  service:
-    enable_windows_service: false
-    service_name: "NGT-AI-Service"
-    service_description: "NGT-AI Decision System Service"
-    
-  # 性能调优
-  performance:
-    use_windows_asyncio: true
-    process_priority: "normal"  # low, normal, high
-    
-# ============ 用户体验配置 ============
-user_experience:
-  # 界面配置
-  interface:
-    show_progress_bar: true
-    show_stage_info: true
-    use_animations: false
-    theme: "default"  # default, dark, light
-    
-  # 交互配置
-  interaction:
-    auto_continue: false
-    confirm_important_actions: true
-    show_hints: true
-    enable_shortcuts: true
-    
-  # 帮助系统
-  help:
-    show_tips: true
-    show_examples: true
-    context_sensitive: true
-
-# ============ 数据配置 ============
-data:
-  # 存储配置
-  storage:
-    base_directory: "data"
-    create_subdirectories: true
-    backup_enabled: false
-    backup_interval: "daily"
-    
-  # 历史记录
-  history:
-    enabled: false
-    max_records: 1000
-    retention_days: 30
-    
-  # 统计数据
-  statistics:
-    enabled: true
-    track_usage: true
-    anonymous_data: true
-
-# ============ API配置 ============
+# ============ API配置（高级选项）============
+# 针对各API提供商的特定配置
 api:
   # 通用API设置
   common:
-    user_agent: "NGT-AI-System/2.0"
-    accept_language: "zh-CN,en;q=0.9"
-    connection_timeout: 30
-    read_timeout: 60
+    user_agent: "NGT-AI-System/2.1"    # 发送给API的User-Agent标识
+    accept_language: "zh-CN,en;q=0.9"  # 接受的语言
+    connection_timeout: 30             # 连接超时（秒）
+    read_timeout: 60                   # 读取超时（秒）
     
   # 提供商特定配置
   providers:
     openai:
-      organization: null
-      project: null
+      organization: null               # OpenAI组织ID（可选）
+      project: null                    # OpenAI项目ID（可选）
       
     google:
-      project_id: null
-      location: null
+      project_id: null                 # Google Cloud项目ID（可选）
+      location: null                   # API调用地区（可选）
       
     anthropic:
-      version: "2023-06-01"
+      version: "2023-06-01"           # Anthropic API版本
       
     deepseek:
-      version: "v1"
+      version: "v1"                    # DeepSeek API版本
       
-  # 错误处理
+  # 错误处理配置
   error_handling:
-    max_retry_attempts: 3
-    retry_status_codes: [429, 500, 502, 503, 504]
-    backoff_factor: 2.0
-    jitter: true
+    max_retry_attempts: 3              # 最大重试次数
+    retry_status_codes: [429, 500, 502, 503, 504]  # 需要重试的HTTP状态码
+                                        # 429=限流，5xx=服务器错误
+    backoff_factor: 2.0                # 退避因子（每次重试等待时间翻倍）
+    jitter: true                       # 是否添加随机抖动（避免同时重试）
 
-# ============ 通知配置 ============
-notifications:
-  # 系统通知
-  system:
-    enabled: false
-    channels: ["console"]  # console, file, email, slack
+# ============ Windows特定配置 ============
+# Windows 11 平台的特殊配置
+windows:
+  console:
+    encoding: "utf-8"                  # 控制台编码
+    colors: true                       # 是否启用彩色输出
+    clear_command: "cls"               # 清屏命令
+    title: "NGT-AI Decision System"    # 窗口标题
     
-  # 错误通知
-  error:
-    enabled: true
-    critical_only: false
-    include_stack_trace: true
-    
-  # 完成通知
-  completion:
-    enabled: false
-    include_summary: true
+  paths:
+    separator: "\\"                    # 路径分隔符
+    use_long_paths: true              # 是否支持长路径（Windows特性）
+    normalize_paths: true             # 是否标准化路径格式
 
-# ============ 备份配置 ============
-backup:
-  enabled: false
-  directory: "backups"
-  frequency: "daily"  # hourly, daily, weekly
-  retention_days: 30
-  compress: true
-  include_logs: false
-  include_cache: false
-
-# ============ 更新配置 ============
-updates:
-  auto_check: false
-  update_channel: "stable"  # stable, beta, dev
-  notify_updates: false
-  auto_install: false
-
-# ============ 许可证配置 ============
-license:
-  type: "MIT"
-  owner: "NGT-AI Team"
-  year: "2024"
-  
 # ============ 元数据 ============
 metadata:
-  config_version: "2.0"
-  last_modified: "2024-12-20T10:00:00Z"
-  checksum: null
+  config_version: "2.1"                # 配置文件版本
+  last_modified: "2024-12-20"         # 最后修改日期
+  # 此配置文件用于NGT-AI决策系统v2.1
+  # 详细文档: README.md
+  # 技术支持: 查看项目文档或提交Issue

@@ -1,18 +1,40 @@
-﻿import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import styles from './StageProgress.module.css';
+import { useLanguage } from '../../i18n/LanguageContext.jsx';
 
 function StageProgress({ currentStage, stages, elapsed, errors }) {
+  const { t, language, setLanguage, availableLanguages } = useLanguage();
+
   return (
     <section className={`glass-panel ${styles.progress}`}>
       <div className={styles.titleRow}>
-        <h2 className={`${styles.title} neon-text`}>任务进度</h2>
+        <h2 className={`${styles.title} neon-text`}>{t('stageProgress.title')}</h2>
         <div className={styles.metrics}>
           <div className={styles.metric}>
-            已用时<strong>{elapsed}</strong>
+            {t('stageProgress.elapsed')}
+            <strong>{elapsed}</strong>
           </div>
           <div className={styles.metric}>
-            错误<strong>{errors}</strong>
+            {t('stageProgress.errors')}
+            <strong>{errors}</strong>
+          </div>
+          <div className={styles.languageSelector}>
+            <label className={styles.languageLabel} htmlFor="language-select">
+              {t('stageProgress.language')}
+            </label>
+            <select
+              id="language-select"
+              className={styles.languageSelect}
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+            >
+              {availableLanguages.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
@@ -24,7 +46,11 @@ function StageProgress({ currentStage, stages, elapsed, errors }) {
           return (
             <div
               key={stage}
-              className={clsx(styles.segment, isCompleted && styles.segmentCompleted, isActive && styles.segmentActive)}
+              className={clsx(
+                styles.segment,
+                isCompleted && styles.segmentCompleted,
+                isActive && styles.segmentActive,
+              )}
             >
               {stageNumber}. {stage}
             </div>

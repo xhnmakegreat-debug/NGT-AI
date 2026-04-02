@@ -1,6 +1,7 @@
-﻿import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import styles from './DecisionInput.module.css';
+import { useLanguage } from '../../i18n/LanguageContext.jsx';
 
 function DecisionInput({
   value,
@@ -13,21 +14,23 @@ function DecisionInput({
   onTokensLimitChange,
   isRunning,
 }) {
+  const { t } = useLanguage();
+
   return (
     <section className={`glass-panel ${styles.container}`}>
       <div>
-        <div className={styles.label}>输入决策问题</div>
+        <div className={styles.label}>{t('decisionInput.label')}</div>
         <textarea
           className={styles.textarea}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder="描述需要协作分析的问题、背景与目标..."
+          placeholder={t('decisionInput.placeholder')}
         />
       </div>
 
       <div className={styles.actions}>
         <button type="button" className={styles.button} onClick={onClear} disabled={!value.trim()}>
-          Clear
+          {t('decisionInput.clear')}
         </button>
         <button
           type="button"
@@ -35,7 +38,7 @@ function DecisionInput({
           onClick={onRun}
           disabled={isRunning || !value.trim()}
         >
-          {isRunning ? '运行中...' : 'Run Decision'}
+          {isRunning ? t('decisionInput.running') : t('decisionInput.run')}
         </button>
       </div>
 
@@ -50,11 +53,11 @@ function DecisionInput({
             onChange={(event) => onToggleRealtimeApi(event.target.checked)}
             hidden
           />
-          实时 API
+          {t('decisionInput.realtime')}
         </label>
 
         <div className={styles.sliderRow}>
-          Tokens 限制
+          {t('decisionInput.tokensLimit')}
           <input
             type="range"
             min="512"

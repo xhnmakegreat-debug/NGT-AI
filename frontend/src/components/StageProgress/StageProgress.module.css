@@ -52,6 +52,8 @@
 .metrics {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .metric {
@@ -65,5 +67,30 @@
 
 .metric strong {
   margin-left: 6px;
+  color: var(--text);
+}
+
+.languageSelector {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #f1f3f5;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.languageLabel {
+  white-space: nowrap;
+}
+
+.languageSelect {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 4px 10px;
+  font-size: 12px;
   color: var(--text);
 }

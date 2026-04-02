@@ -1,0 +1,3 @@
+"""
+NGT-AI FastAPI Backend
+"""

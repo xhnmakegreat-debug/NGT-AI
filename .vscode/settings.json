@@ -1,13 +1,27 @@
 {
      "cSpell.words": [
-       "deepseek",
-       "qwen",
-       "colorama",
-       "pydantic",
-       "pyyaml",
-       "httpx",
-       "asyncio",
-       "venv",
-       "chcp"
-     ]
+      "asyncio",
+      "chcp",
+      "colorama",
+      "deepseek",
+      "httpx",
+      "levelname",
+      "pydantic",
+      "pyyaml",
+      "qwen",
+      "venv"
+    ],
+    "sqltools.connections": [
+      {
+        "ssh": "Disabled",
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "askForPassword": true,
+        "driver": "PostgreSQL",
+        "name": "localpostgres",
+        "database": "ngtai",
+        "username": "ngtai"
+      }
+    ]
    }

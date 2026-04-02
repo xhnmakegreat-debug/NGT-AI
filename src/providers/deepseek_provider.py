@@ -1,6 +1,6 @@
 """
-deepseek模型提供器，兼容openai
-需要安装openai包并配置API密钥
+DeepSeek模型提供器
+DeepSeek使用OpenAI兼容的API接口
 """
 
 from typing import List, Dict
@@ -10,33 +10,48 @@ try:
     import openai
     OPENAI_AVAILABLE = True
 except ImportError:
-    OPENAI_AVAILABLE = Falsegit
+    OPENAI_AVAILABLE = False
 
 class DeepSeekProvider(ModelProvider):
-    """deepseekAPI提供器"""
+    """DeepSeek API提供器 (使用OpenAI兼容接口)"""
     
-    def __init__(self, api_key: str, model: str, ai_id: str):
+    def __init__(self, api_key: str, model: str, ai_id: str, base_url: str = "https://api.deepseek.com"):
+        """
+        初始化DeepSeek提供器
+        
+        Args:
+            api_key: API密钥
+            model: 模型名称
+            ai_id: AI标识符
+            base_url: API端点URL（默认为DeepSeek官方地址）
+        """
         if not OPENAI_AVAILABLE:
             raise ImportError("OpenAI package not installed. Run: pip install openai")
         
         super().__init__(ai_id)
         self.client = openai.AsyncOpenAI(
             api_key=api_key,
-            base_url="https://api.deepseek.com"  # 注意加上 base_url
+            base_url=base_url
         )
-        self.model = model
+        self.model_name = model
     
     async def generate_response(self, messages: List[Dict[str, str]], temperature: float = 0.7) -> str:
         try:
+            # DeepSeek支持的消息格式与OpenAI相同
             response = await self.client.chat.completions.create(
-                model=self.model,
+                model=self.model_name,
                 messages=messages,
                 temperature=temperature,
-                max_tokens=2000
+                max_tokens=2000,
+                top_p=0.9,
+                frequency_penalty=0.0,
+                presence_penalty=0.0
             )
+            
             return response.choices[0].message.content
+            
         except Exception as e:
-            raise Exception(f"deepseek API call failed: {str(e)}")
+            raise Exception(f"DeepSeek API call failed: {str(e)}")
     
     def get_model_name(self) -> str:
-        return self.model
+        return self.model_name

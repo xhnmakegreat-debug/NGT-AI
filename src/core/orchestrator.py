@@ -42,12 +42,17 @@ class NGTOrchestrator:
         logger.info(f"NGT编排器初始化完成: {len(discussant_providers)}个讨论员 + 1个裁判")
     
     async def run_decision_process(self, user_question: str, max_retries: int = 2) -> Dict[str, Any]:
+        """运行完整的NGT决策流程（无进度回调）"""
+        return await self.run_decision_process_with_progress(user_question, max_retries, None)
+    
+    async def run_decision_process_with_progress(self, user_question: str, max_retries: int = 2, progress_callback=None) -> Dict[str, Any]:
         """
-        运行完整的NGT决策流程
+        运行完整的NGT决策流程，支持进度回调
         
         Args:
             user_question: 用户问题
             max_retries: 最大重试次数
+            progress_callback: 进度回调函数
             
         Returns:
             完整的决策结果
@@ -57,26 +62,48 @@ class NGTOrchestrator:
         
         try:
             # 阶段1: 独立观点生成
+            if progress_callback:
+                progress_callback("stage1", 20, "正在生成独立观点...")
             initial_outputs = await self._stage1_independent_ideas(max_retries)
             self.state.complete_stage1(initial_outputs)
+            if progress_callback:
+                progress_callback("stage1", 30, f"已完成独立观点生成，收集到{len(initial_outputs)}个观点")
             
             # 阶段3: 交叉评分与评审
+            if progress_callback:
+                progress_callback("stage3", 40, "正在进行交叉评分...")
             score_sheets = await self._stage3_cross_scoring(max_retries)
             self.state.complete_stage3(score_sheets)
+            if progress_callback:
+                progress_callback("stage3", 50, f"已完成交叉评分，收集到{len(score_sheets)}份评分表")
             
             # 阶段4: 分数聚合
+            if progress_callback:
+                progress_callback("stage4", 60, "正在聚合评分...")
             aggregated_scores = self._stage4_score_aggregation()
             self.state.complete_stage4()
+            if progress_callback:
+                progress_callback("stage4", 70, "已完成分数聚合")
             
             # 阶段5: 修正或捍卫
+            if progress_callback:
+                progress_callback("stage5", 80, "正在进行观点修正或捍卫...")
             final_outputs = await self._stage5_revision_defense(aggregated_scores, max_retries)
             self.state.complete_stage5(final_outputs)
+            if progress_callback:
+                progress_callback("stage5", 85, f"已完成观点修正，收集到{len(final_outputs)}个最终观点")
             
             # 阶段6: 裁判汇总
+            if progress_callback:
+                progress_callback("stage6", 90, "正在进行裁判汇总分析...")
             referee_analysis = await self._stage6_referee_analysis(max_retries)
             self.state.complete_stage6(referee_analysis)
+            if progress_callback:
+                progress_callback("stage6", 95, "已完成裁判汇总")
             
             # 生成最终结果
+            if progress_callback:
+                progress_callback("completed", 100, "正在生成最终报告...")
             result = self._generate_final_result()
             logger.info(f"NGT决策流程完成，耗时 {self.state.get_duration():.2f}秒")
             
@@ -91,10 +118,17 @@ class NGTOrchestrator:
         """阶段1: 独立观点生成"""
         logger.info("阶段1: 生成独立观点")
         
-        system_prompt = self._get_initial_idea_prompt()
+        base_system_prompt = self._get_initial_idea_prompt()
         
         tasks = []
         for provider in self.discussants:
+            # 检查是否有自定义提示词
+            custom_prompt = getattr(provider, 'custom_prompt', None)
+            if custom_prompt:
+                system_prompt = f"{base_system_prompt}\n\n你的角色特点: {custom_prompt}"
+            else:
+                system_prompt = base_system_prompt
+            
             messages = [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": self.state.user_question}
@@ -141,10 +175,17 @@ class NGTOrchestrator:
         
         # 准备观点摘要
         ideas_summary = self._format_ideas_for_scoring(self.state.initial_outputs)
-        system_prompt = self._get_scoring_prompt()
+        base_system_prompt = self._get_scoring_prompt()
         
         tasks = []
         for provider in self.discussants:
+            # 检查是否有自定义提示词
+            custom_prompt = getattr(provider, 'custom_prompt', None)
+            if custom_prompt:
+                system_prompt = f"{base_system_prompt}\n\n你的角色特点: {custom_prompt}"
+            else:
+                system_prompt = base_system_prompt
+            
             messages = [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"请对以下观点进行评分：\n\n{ideas_summary}"}
@@ -241,7 +282,14 @@ class NGTOrchestrator:
             
             # 准备反馈信息
             feedback_text = self._format_feedback_for_revision(score_data)
-            system_prompt = self._get_revision_prompt()
+            base_system_prompt = self._get_revision_prompt()
+            
+            # 检查是否有自定义提示词
+            custom_prompt = getattr(provider, 'custom_prompt', None)
+            if custom_prompt:
+                system_prompt = f"{base_system_prompt}\n\n你的角色特点: {custom_prompt}"
+            else:
+                system_prompt = base_system_prompt
             
             messages = [
                 {"role": "system", "content": system_prompt},
@@ -294,7 +342,14 @@ class NGTOrchestrator:
         
         # 准备最终观点摘要
         final_summary = self._format_final_outputs_for_referee(self.state.final_outputs)
-        system_prompt = self._get_referee_prompt()
+        base_system_prompt = self._get_referee_prompt()
+        
+        # 检查裁判是否有自定义提示词
+        custom_prompt = getattr(self.referee, 'custom_prompt', None)
+        if custom_prompt:
+            system_prompt = f"{base_system_prompt}\n\n你的角色特点: {custom_prompt}"
+        else:
+            system_prompt = base_system_prompt
         
         messages = [
             {"role": "system", "content": system_prompt},

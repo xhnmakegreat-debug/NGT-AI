@@ -96,7 +96,12 @@ class NGTLogger:
         """记录阶段完成"""
         message = f"✅ {stage} 完成"
         if duration is not None:
-            message += f" - 耗时: {duration:.2f}秒"
+            # 确保duration是数字类型
+            try:
+                duration_float = float(duration) if isinstance(duration, str) else duration
+                message += f" - 耗时: {duration_float:.2f}秒"
+            except (ValueError, TypeError):
+                message += f" - 耗时: {duration}"
         if results_count is not None:
             message += f" - 结果数量: {results_count}"
         self.logger.info(message)

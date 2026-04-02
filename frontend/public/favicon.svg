@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="ngt-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5A60FF" />
+      <stop offset="100%" stop-color="#4DD4FF" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#ngt-gradient)" />
+  <path
+    d="M17 43V21h6.4l10.2 13.9V21H40v22h-6.4L23.3 29.1V43H17z"
+    fill="#ffffff"
+  />
+  <path
+    d="M46.2 21c3.8 0 6.8 2.8 6.8 6.4 0 2.7-1.6 4.9-4.2 5.8l4.5 9.8H47l-4-9.1h-2V43h-5.8V21h11zM45.6 26.8h-4.6v3.5h4.6c1.2 0 2-.7 2-1.8 0-1.1-.8-1.7-2-1.7z"
+    fill="#ffffff"
+  />
+</svg>
